@@ -33,6 +33,13 @@
     return (el.value || '').trim();
   }
 
+  // Untuk checkbox bernama sama (mis. tambahan player) → gabung jadi satu baris
+  function valMulti(name) {
+    return $$('[name="' + name + '"]:checked', form)
+      .map(function (el) { return el.value.trim(); })
+      .join(', ');
+  }
+
   function formatTanggal(iso) {
     if (!iso) return '';
     var p = iso.split('-');
@@ -93,16 +100,20 @@
   function clearAllErrors() {
     RULES.forEach(function (r) { clearError(r.name); });
     $('#formStatus').textContent = '';
+    var sum = $('#errSummary');
+    sum.classList.remove('is-visible');
+    sum.textContent = '';
   }
 
   function validate() {
     clearAllErrors();
-    var firstBad = null;
+    var firstBad = null, jumlah = 0;
 
     RULES.forEach(function (r) {
       if (r.when && !r.when()) return;
       if (!val(r.name)) {
         showError(r.name, r.msg);
+        jumlah++;
         if (!firstBad) firstBad = r.name;
       }
     });
@@ -111,17 +122,25 @@
     var tgl = val('tanggalAcara');
     if (tgl && tgl < todayISO()) {
       showError('tanggalAcara', 'Tanggal acara sudah lewat. Mohon pilih tanggal ke depan.');
+      jumlah++;
       if (!firstBad) firstBad = 'tanggalAcara';
     }
 
     if (firstBad) {
+      var sum = $('#errSummary');
+      sum.textContent = jumlah === 1
+        ? 'Ada 1 isian wajib yang belum lengkap. Bagian yang perlu diisi ditandai merah di atas.'
+        : 'Ada ' + jumlah + ' isian wajib yang belum lengkap. Bagian yang perlu diisi ditandai merah di atas.';
+      sum.classList.remove('is-visible');
+      void sum.offsetWidth;              // paksa animasi jalan lagi saat submit berulang
+      sum.classList.add('is-visible');
+
       var el = form.querySelector('[name="' + firstBad + '"]');
       if (el) {
         var target = el.closest('.field') || el;
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
         if (el.focus) { try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); } }
       }
-      $('#formStatus').textContent = 'Ada isian yang belum lengkap — lihat tanda di atas.';
       return false;
     }
     return true;
@@ -140,6 +159,14 @@
     if (val('jamMulai') && val('jamSelesai')) waktu = val('jamMulai') + ' - ' + val('jamSelesai');
     else if (val('jamMulai')) waktu = 'mulai ' + val('jamMulai');
 
+    // Gabungkan tambahan player dari checkbox + kolom teks bebas
+    var tambahan = [valMulti('addPlayer'), val('additionalPlayer')]
+      .filter(function (x) { return x; })
+      .join(', ');
+
+    // Catatan format pensi ikut terkirim supaya tidak perlu ditanya ulang di chat
+    var isPensi = val('jenisEvent') === 'Pensi / Pentas Seni';
+
     var groups = [
       {
         title: 'DETAIL ACARA',
@@ -149,7 +176,8 @@
           ['Jenis Event',  jenis],
           ['Tanggal Acara', formatTanggal(val('tanggalAcara'))],
           ['Waktu Tampil', waktu],
-          ['Lokasi Acara', val('lokasiAcara')]
+          ['Lokasi Acara', val('lokasiAcara')],
+          ['Format', isPensi ? 'Pensi — slot 1 jam (45 menit tampil + 15 menit cek sound)' : '']
         ]
       },
       {
@@ -157,7 +185,8 @@
         rows: [
           ['Paket',             val('paket')],
           ['Durasi Tambahan',   val('durasiTambahan')],
-          ['Additional Player', val('additionalPlayer')]
+          ['Tambahan Player',   tambahan],
+          ['Pemesanan',         val('multiAcara')]
         ]
       },
       {
@@ -234,14 +263,17 @@
 
   /* ---------------- Interaksi form ---------------- */
 
-  // "Lainnya" pada jenis event
+  // "Lainnya" pada jenis event + catatan format pensi
   var selJenis = $('#jenisEvent');
   var wrapLain = $('#wrapJenisLain');
+  var notePensi = $('#notePensi');
   selJenis.addEventListener('change', function () {
     var show = selJenis.value === 'Lainnya';
     wrapLain.classList.toggle('is-hidden', !show);
     if (show) $('#jenisEventLain').focus();
     else clearError('jenisEventLain');
+
+    notePensi.classList.toggle('is-hidden', selJenis.value !== 'Pensi / Pentas Seni');
   });
 
   // Peringatan lunak jam selesai < jam mulai
@@ -256,11 +288,22 @@
   // Tanggal minimal hari ini
   $('#tanggalAcara').setAttribute('min', todayISO());
 
-  // Hapus error begitu field diperbaiki
+  // Hapus error begitu field diperbaiki, dan perbarui ringkasan di bawah
+  function syncSummary() {
+    var sisa = $$('.field.has-error', form).length;
+    var sum = $('#errSummary');
+    if (!sisa) { sum.classList.remove('is-visible'); return; }
+    sum.textContent = sisa === 1
+      ? 'Tinggal 1 isian wajib lagi. Bagian yang perlu diisi ditandai merah.'
+      : 'Masih ada ' + sisa + ' isian wajib yang belum lengkap.';
+  }
+
   RULES.forEach(function (r) {
     $$('[name="' + r.name + '"]').forEach(function (el) {
       var ev = (el.type === 'radio' || el.tagName === 'SELECT') ? 'change' : 'input';
-      el.addEventListener(ev, function () { if (val(r.name)) clearError(r.name); });
+      el.addEventListener(ev, function () {
+        if (val(r.name)) { clearError(r.name); syncSummary(); }
+      });
     });
   });
 

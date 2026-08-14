@@ -60,6 +60,9 @@
   --line: rgba(250, 250, 250, .18);
   --line-strong: rgba(250, 250, 250, .40);
   --surface: rgba(250, 250, 250, .04);
+  --err: #FF5247;
+  --err-bg: rgba(255, 82, 71, .12);
+  --err-fg: #0A0A0A;
 }
 .section--light {
   --bg: var(--white); --fg: var(--black);
@@ -67,6 +70,9 @@
   --line: rgba(10, 10, 10, .16);
   --line-strong: rgba(10, 10, 10, .38);
   --surface: rgba(10, 10, 10, .03);
+  --err: #C81E10;
+  --err-bg: rgba(200, 30, 16, .08);
+  --err-fg: #FFFFFF;
 }
 
 /* ---------- Reset ---------- */
@@ -316,6 +322,10 @@ ul, ol { margin: 0; padding: 0; }
   margin-bottom: .75rem;
 }
 .card--service p { color: var(--muted); font-size: .9375rem; }
+.card--service p strong { color: var(--fg); font-weight: 600; }
+#layanan .grid-4 { grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); }
+@media (max-width: 1000px) { #layanan .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px)  { #layanan .grid-4 { grid-template-columns: 1fr; } }
 
 /* ---------- Packages ---------- */
 .card--pkg { position: relative; }
@@ -349,6 +359,25 @@ ul, ol { margin: 0; padding: 0; }
   content: ""; position: absolute; left: 0; top: .62em;
   width: .4rem; height: 1px; background: currentColor;
 }
+.pkg-bonus {
+  margin-top: 1.25rem;
+  padding: .8rem .9rem;
+  border: 1px dashed var(--line-strong);
+  font-size: .8438rem;
+  line-height: 1.5;
+  color: var(--fg);
+}
+.pkg-bonus em { color: var(--muted); font-style: normal; font-size: .8125rem; }
+.bonus-tag {
+  display: inline-block;
+  background: var(--fg); color: var(--bg);
+  font-size: .625rem; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase;
+  padding: .2rem .45rem;
+  margin-right: .4rem;
+  vertical-align: 1px;
+}
+
 .pkg-price {
   margin-top: auto; padding-top: 1.75rem;
   font-family: var(--font-display);
@@ -370,6 +399,46 @@ ul, ol { margin: 0; padding: 0; }
 .callout p { color: var(--muted); font-size: .9688rem; }
 .callout strong { color: var(--fg); font-weight: 600; }
 .callout--warn { border-left-color: var(--fg); }
+
+/* ---------- Yang sudah termasuk ---------- */
+.includes-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  margin-top: clamp(3rem, 7vw, 5rem);
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid var(--fg);
+}
+.includes {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+}
+@media (max-width: 900px) { .includes { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .includes { grid-template-columns: 1fr; } }
+.includes li {
+  padding: 1.75rem 1.5rem 1.75rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.includes h4 {
+  font-size: 1rem; font-weight: 700;
+  margin-bottom: .5rem;
+}
+.includes p { color: var(--muted); font-size: .9063rem; }
+
+/* ---------- Note box (dalam form) ---------- */
+.note-box {
+  border-left: 3px solid var(--fg);
+  background: var(--surface);
+  padding: .9rem 1.1rem;
+  font-size: .875rem;
+  color: var(--muted);
+  margin-top: .25rem;
+}
+.note-box strong { color: var(--fg); font-weight: 600; }
+.note-box.is-hidden { display: none; }
 
 /* ---------- Form ---------- */
 .form { display: flex; flex-direction: column; gap: clamp(2rem, 4vw, 3rem); }
@@ -439,13 +508,87 @@ input[type="time"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity
 .section--dark input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); }
 
 .hint { font-size: .8125rem; color: var(--muted); }
-.error { font-size: .8125rem; font-weight: 600; color: var(--fg); display: none; }
-.error.is-visible { display: block; }
-.error::before { content: "↳ "; opacity: .5; }
+.hint strong { color: var(--fg); font-weight: 600; }
+
+/* ---------- Status error ---------- */
+.req { color: var(--err); opacity: 1; font-weight: 700; }
+
+.error {
+  display: none;
+  align-items: center;
+  gap: .5rem;
+  font-size: .8438rem;
+  font-weight: 600;
+  color: var(--err);
+}
+.error.is-visible { display: flex; }
+.error::before {
+  content: "!";
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem; height: 1.15rem;
+  background: var(--err);
+  color: var(--err-fg);
+  font-size: .75rem;
+  font-weight: 700;
+  border-radius: 50%;
+}
+
+/* Kotak merah pada field yang bermasalah.
+   Memakai outline + box-shadow (bukan border/padding) supaya tidak ada
+   pergeseran layout sama sekali saat error muncul dan hilang. */
+.field.has-error {
+  outline: 2px solid var(--err);
+  outline-offset: .45rem;
+  background: var(--err-bg);
+  box-shadow: 0 0 0 .45rem var(--err-bg);
+  animation: errIn .2s var(--ease);
+}
+@keyframes errIn { from { opacity: .35; } to { opacity: 1; } }
+
+.field.has-error > label,
+.field.has-error .label-as-text { color: var(--err); }
+
 .field.has-error input,
 .field.has-error select,
-.field.has-error textarea { border-color: var(--fg); box-shadow: inset 0 0 0 1px var(--fg); }
-.field.has-error .radio-cards, .field.has-error .radio-row { outline: 1px solid var(--fg); outline-offset: .5rem; }
+.field.has-error textarea {
+  border-color: var(--err);
+  box-shadow: inset 0 0 0 1px var(--err);
+  background: var(--bg);
+}
+.field.has-error .radio-card-body,
+.field.has-error .radio-pill span { border-color: var(--err); }
+
+/* Ringkasan error di atas tombol kirim */
+.err-summary {
+  display: none;
+  align-items: flex-start;
+  gap: .75rem;
+  width: 100%;
+  text-align: left;
+  border: 2px solid var(--err);
+  background: var(--err-bg);
+  color: var(--err);
+  padding: .95rem 1.1rem;
+  font-size: .875rem;
+  font-weight: 600;
+}
+.err-summary.is-visible { display: flex; animation: shake .3s var(--ease); }
+.err-summary::before {
+  content: "!";
+  flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.4rem; height: 1.4rem;
+  background: var(--err); color: var(--err-fg);
+  font-weight: 700; border-radius: 50%;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%     { transform: translateX(-5px); }
+  75%     { transform: translateX(5px); }
+}
 
 .warn {
   font-size: .875rem; color: var(--muted);
@@ -456,10 +599,14 @@ input[type="time"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity
 
 /* Radio cards */
 .radio-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: .625rem; }
+.radio-cards--addon { grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); }
 @media (max-width: 560px) {
   .radio-cards { grid-template-columns: repeat(2, 1fr); }
   .radio-cards .radio-card:last-child { grid-column: 1 / -1; }
+  .radio-cards--addon { grid-template-columns: 1fr; }
+  .radio-cards--addon .radio-card:last-child { grid-column: auto; }
 }
+.radio-cards--addon .rc-sub { font-size: .6875rem; }
 .radio-card, .radio-pill { position: relative; cursor: pointer; }
 .radio-card input, .radio-pill input {
   position: absolute; opacity: 0; width: 0; height: 0;
