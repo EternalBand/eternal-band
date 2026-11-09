@@ -9,7 +9,7 @@
   /* ---------------- Konfigurasi ----------------
      Satu-satunya tempat yang perlu diubah kalau nomor WhatsApp berganti. */
   var CONFIG = {
-    waNumber: '6288215797276',            // format internasional, tanpa + dan tanpa 0
+    waNumber: '6288200319538',            // format internasional, tanpa + dan tanpa 0
     closing: 'Mohon informasi penawaran biaya dan konfirmasi ketersediaan tanggalnya. Terima kasih.'
   };
 
