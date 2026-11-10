@@ -281,6 +281,15 @@ ul, ol { margin: 0; padding: 0; }
 .hero-tagline strong { color: var(--fg); font-weight: 600; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: clamp(2rem, 5vw, 3rem); }
 .hero-note { margin-top: 1.5rem; font-size: .9375rem; color: var(--muted); }
+.hero-price {
+  margin-top: clamp(1.5rem, 3vw, 2rem);
+  display: flex; flex-direction: column; gap: .4rem;
+}
+.hero-price-label { font-size: .8125rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.hero-price-num { font-family: var(--font-display); font-size: clamp(2.25rem, 6vw, 3.5rem); line-height: 1; }
+.hero-price-num small { font-size: .45em; color: var(--muted); letter-spacing: .04em; }
+.hero-price-note { font-size: .875rem; color: var(--muted); }
+.section-lead strong { color: var(--fg); font-weight: 600; }
 @media (max-width: 460px) {
   .hero .eyebrow { letter-spacing: .16em; }
   .hero-actions { flex-direction: column; align-items: stretch; }
@@ -378,15 +387,94 @@ ul, ol { margin: 0; padding: 0; }
   vertical-align: 1px;
 }
 
-.pkg-price {
-  margin-top: auto; padding-top: 1.75rem;
+.pkg-price { margin-top: auto; padding-top: 1.75rem; }
+.pkg-price-num {
   font-family: var(--font-display);
-  font-size: 1.0625rem;
-  line-height: 1.2;
-  text-transform: uppercase;
-  letter-spacing: .01em;
+  font-size: clamp(1.75rem, 2.6vw, 2.25rem);
+  line-height: 1;
+  letter-spacing: .005em;
 }
+.pkg-price-unit {
+  margin-top: .35rem;
+  font-size: .75rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted);
+}
+.pkg-extra {
+  margin-top: .85rem; padding-top: .85rem;
+  border-top: 1px dashed var(--line-strong);
+  font-size: .875rem; color: var(--muted);
+}
+.pkg-extra strong { color: var(--fg); font-weight: 700; }
 .card--pkg .btn { margin-top: 1.25rem; }
+
+/* ---------- Orgen Tunggal ---------- */
+.card--orgen {
+  margin-top: var(--gap);
+  display: grid; grid-template-columns: 1.1fr 2fr; gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: start;
+}
+@media (max-width: 860px) { .card--orgen { grid-template-columns: 1fr; } }
+.orgen-head .pkg-meta { margin: 0 0 .5rem; }
+.orgen-desc { margin-top: .9rem; color: var(--muted); font-size: .9375rem; }
+.orgen-desc em { font-style: normal; color: var(--fg); font-weight: 600; }
+.orgen-options { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+@media (max-width: 560px) { .orgen-options { grid-template-columns: 1fr; } }
+.orgen-opt { border: 1px solid var(--line); padding: 1.25rem; display: flex; flex-direction: column; }
+.orgen-opt-title { font-size: .75rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.orgen-opt-sub { margin-top: .35rem; font-weight: 600; }
+.orgen-opt-price {
+  margin-top: auto; padding-top: 1rem;
+  font-family: var(--font-display); font-size: 1.25rem; text-transform: uppercase;
+}
+.orgen-opt .btn { margin-top: 1rem; }
+
+/* ---------- Tabel harga per durasi ---------- */
+.price-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.price-table { width: 100%; min-width: 520px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.price-table th, .price-table td {
+  padding: 1rem .75rem; text-align: right;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.price-table thead th {
+  font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--muted);
+}
+.price-table th:first-child { text-align: left; padding-left: 0; }
+.price-table tbody th { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; text-transform: uppercase; }
+.price-table tbody th span {
+  display: block; font-family: var(--font-body); font-size: .6875rem; font-weight: 600;
+  letter-spacing: .12em; color: var(--muted);
+}
+.price-table tbody td:nth-child(2) { font-weight: 700; }
+.table-note { margin-top: 1rem; font-size: .875rem; color: var(--muted); max-width: 72ch; }
+.table-note strong { color: var(--fg); font-weight: 600; }
+
+/* ---------- Tambahan player ---------- */
+.addons {
+  list-style: none;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+}
+@media (max-width: 900px) { .addons { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .addons { grid-template-columns: 1fr; } }
+.addons li { padding: 1.5rem 1.5rem 1.5rem 0; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: .35rem; }
+.addons h4 { font-family: var(--font-display); font-weight: 400; font-size: 1.375rem; text-transform: uppercase; }
+.addons p { color: var(--muted); font-size: .875rem; }
+.addons em { font-style: normal; }
+.addons .addon-price { margin-top: auto; padding-top: .5rem; color: var(--fg); }
+.addons .addon-price strong { font-size: 1.0625rem; }
+
+/* ---------- Diskon & DP ---------- */
+.deals {
+  margin-top: clamp(3rem, 7vw, 5rem);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap);
+}
+@media (max-width: 760px) { .deals { grid-template-columns: 1fr; } }
+.deal { border: 1px solid var(--line-strong); padding: clamp(1.25rem, 3vw, 1.75rem); }
+.deal-num { font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 3.5rem); line-height: .9; }
+.deal-text { margin-top: .75rem; color: var(--muted); font-size: .9375rem; }
+.deal-text strong { color: var(--fg); font-weight: 600; }
 
 /* ---------- Callout ---------- */
 .callout {
@@ -438,7 +526,14 @@ ul, ol { margin: 0; padding: 0; }
   margin-top: .25rem;
 }
 .note-box strong { color: var(--fg); font-weight: 600; }
+.note-box p + p, .note-box p + ul { margin-top: .5rem; }
+.note-box ul { padding-left: 1.1rem; }
 .note-box.is-hidden { display: none; }
+.is-hidden { display: none !important; }
+
+.radio-card.is-disabled { cursor: not-allowed; opacity: .4; }
+.radio-card.is-disabled .radio-card-body { border-style: dashed; }
+select:disabled { opacity: .6; cursor: not-allowed; }
 
 /* ---------- Form ---------- */
 .form { display: flex; flex-direction: column; gap: clamp(2rem, 4vw, 3rem); }

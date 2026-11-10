@@ -9,11 +9,15 @@ lalu WhatsApp terbuka dengan pesan yang sudah tersusun rapi — tinggal tekan ki
 
 ## ⚠️ Aturan paling penting
 
-**Jangan pernah menambahkan angka harga, nominal DP, atau nomor rekening
-ke file mana pun di folder ini.** Semua nominal disampaikan langsung oleh
-pemilik lewat chat WhatsApp. Ini keputusan bisnis, bukan sekadar preferensi:
-harga adalah ruang negosiasi, dan nomor rekening yang dipublikasikan terbuka
-rawan disalahgunakan orang lain untuk menipu calon client.
+**Jangan pernah menambahkan nomor rekening / e-wallet ke file mana pun di
+folder ini.** Detail pembayaran hanya dikirim lewat chat WhatsApp resmi.
+Nomor rekening yang dipublikasikan terbuka rawan disalahgunakan orang lain
+untuk menipu calon client.
+
+Harga paket, harga tambahan player, diskon, dan DP minimal **sekarang
+ditampilkan** di website sebagai daya tarik (sejak November 2026). Kalau
+harga berubah, ubah di semua tempat yang tercantum di bagian
+*Ubah harga* di bawah.
 
 ---
 
@@ -42,7 +46,7 @@ assets/
 4. Bagian *Source*, pilih **Deploy from a branch**.
 5. Pilih branch **main**, folder **/ (root)**, lalu **Save**.
 6. Tunggu 1–2 menit. Website aktif di
-   `https://<username-github-anda>.github.io/eternal-band/`
+   `https://eternalband.github.io/eternal-band/`
 
 Setiap kali Anda mengubah file dan menyimpannya di GitHub, website otomatis
 ter-update dalam 1–2 menit.
@@ -57,21 +61,40 @@ Buka `script.js`, baris paling atas:
 
 ```js
 var CONFIG = {
-  waNumber: '6288215797276',
+  waNumber: '62882003195388',
 ```
 
 Tulis dengan format internasional: kode negara `62`, **tanpa** tanda `+`,
-**tanpa** angka `0` di depan, dan tanpa spasi. Nomor `0882-1579-7276`
-menjadi `6288215797276`.
+**tanpa** angka `0` di depan, dan tanpa spasi. Nomor `0882-0031-95388`
+menjadi `62882003195388`.
 
 Nomor juga muncul di dua tempat lain di `index.html` — cari `wa.me` dengan
 Ctrl+F dan ganti semuanya.
+
+### Ubah harga
+
+Harga dasar dihitung **per 1 jam tampil**. Rumusnya (dari dokumen harga internal):
+`harga = biaya kehadiran + jam × jumlah player × Rp100.000`.
+
+Angka harga muncul di beberapa tempat di `index.html` — cari dengan Ctrl+F `Rp`
+dan `000`:
+
+- `<meta name="description">` dan `og:description` (mulai Rp1,5 juta)
+- hero (`hero-price`)
+- kartu paket (`pkg-price`) dan tabel *Harga per durasi* (`price-table`)
+- *Tambahan player* (`addons`), *Diskon & DP* (`deals`)
+- pilihan paket & tambahan player di form (`rc-sub`)
+- FAQ dan Syarat & ketentuan
+
+Harga Orgen Tunggal saat ini masih "Harga via WhatsApp".
 
 ### Ubah isi paket
 
 Buka `index.html`, cari bagian `<!-- ================= PAKET -->`.
 Setiap paket ada di dalam satu blok `<article class="card card--pkg">`.
 Ubah nama paket, angka jumlah player, dan daftar instrumennya langsung di situ.
+
+Paket Orgen Tunggal ada di blok `<article class="card card--orgen">`.
 
 Kalau menambah atau mengganti nama paket, jangan lupa ubah juga pilihannya
 di form — cari `<div class="radio-cards" id="paketCards">`. Nama paket di kedua
@@ -102,6 +125,9 @@ langsung dari folder, dan akan benar setelah di-upload).
 - Isi lengkap lalu tekan kirim → WhatsApp terbuka dengan pesan sudah tersusun.
 - Kosongkan "Request Lagu" → baris itu harus **hilang total** dari pesan, tidak
   menyisakan label kosong.
+- Pilih jenis event "Pensi" → durasi terkunci 1 jam, Orgen Tunggal tidak bisa dipilih,
+  dan catatan rider muncul.
+- Pilih paket Platinum → pilihan tambahan Saxophone hilang (sudah termasuk).
 - Tes di HP, bukan cuma di laptop — mayoritas client membuka dari HP.
 
 ---

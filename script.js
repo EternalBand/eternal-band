@@ -1,7 +1,7 @@
 /* =========================================================
    ETERNAL Band — script.js
    Validasi form + penyusunan pesan WhatsApp.
-   TIDAK ADA nominal harga, DP, atau nomor rekening di file ini.
+   TIDAK ADA nomor rekening di file ini. Harga ditulis di index.html.
    ========================================================= */
 (function () {
   'use strict';
@@ -10,7 +10,7 @@
      Satu-satunya tempat yang perlu diubah kalau nomor WhatsApp berganti. */
   var CONFIG = {
     waNumber: '62882003195388',            // format internasional, tanpa + dan tanpa 0
-    closing: 'Mohon informasi penawaran biaya dan konfirmasi ketersediaan tanggalnya. Terima kasih.'
+    closing: 'Mohon konfirmasi ketersediaan tanggal dan rincian biayanya. Terima kasih.'
   };
 
   var BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -184,7 +184,7 @@
         title: 'PILIHAN PAKET',
         rows: [
           ['Paket',             val('paket')],
-          ['Durasi Tambahan',   val('durasiTambahan')],
+          ['Durasi Tampil',     val('durasi')],
           ['Tambahan Player',   tambahan],
           ['Pemesanan',         val('multiAcara')]
         ]
@@ -263,18 +263,56 @@
 
   /* ---------------- Interaksi form ---------------- */
 
-  // "Lainnya" pada jenis event + catatan format pensi
+  // "Lainnya" pada jenis event + aturan khusus pensi
+  var PENSI = 'Pensi / Pentas Seni';
   var selJenis = $('#jenisEvent');
   var wrapLain = $('#wrapJenisLain');
   var notePensi = $('#notePensi');
+  var selDurasi = $('#durasi');
+  var hintDurasi = $('#hintDurasi');
+  var hintDurasiDefault = hintDurasi.textContent;
+  var orgenInputs = $$('.js-orgen input', form);
+
+  function isPensi() { return selJenis.value === PENSI; }
+
+  // Pensi: durasi dikunci 1 jam, Orgen Tunggal tidak tersedia
+  function applyPensi() {
+    var pensi = isPensi();
+    notePensi.classList.toggle('is-hidden', !pensi);
+    $('#noteOrgenPensi').classList.toggle('is-hidden', !pensi);
+
+    if (pensi) selDurasi.value = '1 jam';
+    selDurasi.disabled = pensi;
+    hintDurasi.textContent = pensi ? 'Acara pensi khusus 1 jam (45 menit tampil + 15 menit cek sound).' : hintDurasiDefault;
+
+    orgenInputs.forEach(function (el) {
+      if (pensi && el.checked) el.checked = false;
+      el.disabled = pensi;
+      el.closest('.radio-card').classList.toggle('is-disabled', pensi);
+    });
+  }
+
   selJenis.addEventListener('change', function () {
     var show = selJenis.value === 'Lainnya';
     wrapLain.classList.toggle('is-hidden', !show);
     if (show) $('#jenisEventLain').focus();
     else clearError('jenisEventLain');
-
-    notePensi.classList.toggle('is-hidden', selJenis.value !== 'Pensi / Pentas Seni');
+    applyPensi();
   });
+
+  // Platinum sudah termasuk saxophone → sembunyikan pilihan tambahan saxophone
+  var addonSax = $('#addonSax');
+  function applyPaket() {
+    var platinum = val('paket') === 'Platinum';
+    if (platinum) addonSax.querySelector('input').checked = false;
+    addonSax.classList.toggle('is-hidden', platinum);
+    $('#hintSaxPlatinum').classList.toggle('is-hidden', !platinum);
+  }
+  $$('[name="paket"]', form).forEach(function (el) { el.addEventListener('change', applyPaket); });
+
+  // Browser bisa memulihkan isian form saat tombol Back → samakan tampilannya
+  applyPensi();
+  applyPaket();
 
   // Peringatan lunak jam selesai < jam mulai
   var warnJam = $('#warnJam');
@@ -311,10 +349,11 @@
   $$('.js-pick').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var nama = btn.getAttribute('data-package');
-      var radio = form.querySelector('[name="paket"][value="' + nama + '"]');
-      if (radio) { radio.checked = true; clearError('paket'); }
+      var radio = $$('[name="paket"]', form).filter(function (r) { return r.value === nama; })[0];
       $('#form').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      toast('Paket ' + nama + ' dipilih');
+      if (radio && radio.disabled) { toast('Orgen Tunggal tidak tersedia untuk pensi'); return; }
+      if (radio) { radio.checked = true; clearError('paket'); applyPaket(); }
+      toast(nama + ' dipilih');
     });
   });
 
